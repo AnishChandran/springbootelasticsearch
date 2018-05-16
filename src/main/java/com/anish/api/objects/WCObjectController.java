@@ -1,0 +1,49 @@
+package com.anish.api.objects;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.anish.api.exceptions.ResourceNotFoundException;
+
+@RestController
+public class WCObjectController {
+
+	private final String urlPath = "/api/v1/objects";
+	@Autowired
+	WCObjectsRepository wcobjectRepository;
+	
+	@GetMapping(value = urlPath)
+	public List<WCObject> getAllObjects() {
+		return wcobjectRepository.findAll();
+	}
+	
+	@GetMapping(value = urlPath + "/{id}")
+	public WCObject getObject(@PathVariable Long id) {
+		return wcobjectRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("objects", "id", id));
+	}
+
+	@PostMapping(value = urlPath)
+	public WCObject createObject(@RequestBody WCObject entity) {
+		entity = wcobjectRepository.save(entity);
+		return entity;
+	}
+	
+	@PutMapping(value = urlPath + "/{id}")
+	public WCObject putMethodName(@PathVariable Long id, @RequestBody WCObject newWCObject) {
+		WCObject wcObject = wcobjectRepository.findById(id)
+    			.orElseThrow(() -> new ResourceNotFoundException("Objects", "id", id));
+		newWCObject.setId(wcObject.getId());
+    	newWCObject = wcobjectRepository.save(newWCObject);
+    	return newWCObject;
+	}
+
+
+}
