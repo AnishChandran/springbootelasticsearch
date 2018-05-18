@@ -1,7 +1,11 @@
 package com.anish.api.objects;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anish.api.exceptions.ResourceNotFoundException;
+import com.anish.api.tags.Tag;
+import com.anish.api.tags.TagsRepository;
 
 @RestController
 public class WCObjectController {
@@ -18,6 +24,9 @@ public class WCObjectController {
 	private final String urlPath = "/api/v1/objects";
 	@Autowired
 	WCObjectsRepository wcobjectRepository;
+	
+	@Autowired
+	TagsRepository tagRepository;
 	
 	@GetMapping(value = urlPath)
 	public List<WCObject> getAllObjects() {
@@ -37,13 +46,31 @@ public class WCObjectController {
 	}
 	
 	@PutMapping(value = urlPath + "/{id}")
-	public WCObject putMethodName(@PathVariable Long id, @RequestBody WCObject newWCObject) {
+	public WCObject updateObject(@PathVariable Long id, @RequestBody WCObject newWCObject) {
 		WCObject wcObject = wcobjectRepository.findById(id)
     			.orElseThrow(() -> new ResourceNotFoundException("Objects", "id", id));
 		newWCObject.setId(wcObject.getId());
     	newWCObject = wcobjectRepository.save(newWCObject);
     	return newWCObject;
 	}
-
+	
+	@PostMapping(value = urlPath + "/{id}/associateTags")
+	public WCObject associateTags(@PathVariable Long id, @RequestBody Map<String , Object> tagMap) {
+		try {
+			WCObject wcObject = wcobjectRepository.findById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Objects", "id", id));
+			List<Integer> tagIds = (ArrayList<Integer>)tagMap.get("tagIds");
+			List<Long> tagas = new ArrayList<Long>();
+			for (Integer ids : tagIds) {
+				tagas.add(Long.valueOf(ids));
+			}
+			List<Tag> tags = tagRepository.findByIdIn(tagas);
+			wcObject.setTags(tags);
+			wcObject = wcobjectRepository.save(wcObject);
+			return wcObject;
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }

@@ -9,5 +9,6 @@ import com.anish.api.categories.Category;
 public interface TagsRepository extends JpaRepository<Tag, Long>{
 	
 	public List<Tag> findByCategory(Category category);
+	public List<Tag> findByIdIn(List<Long> tagIds);
 
 }

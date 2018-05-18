@@ -28,8 +28,7 @@ public class WCObject {
 	@NotEmpty
 	private String wildcraftId;
 	
-	@OneToMany(mappedBy="wcObject")
-	@JsonManagedReference(value="wcobject-tag")
+	@OneToMany
 	private List<Tag> tags;
 	
 	public WCObject() {
@@ -64,5 +63,13 @@ public class WCObject {
 
 	public void setWildcraftId(String wildcraftId) {
 		this.wildcraftId = wildcraftId;
+	}
+	
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
+	}
+	
+	public List<Tag> getTags() {
+		return tags;
 	}
 }
