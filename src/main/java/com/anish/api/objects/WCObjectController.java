@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +23,12 @@ public class WCObjectController {
 	@Autowired
 	WCObjectsRepository wcobjectRepository;
 	
+	
 	@Autowired
 	TagsRepository tagRepository;
+	
+	@Autowired
+	WCobjectDAO objectDao;
 	
 	@GetMapping(value = urlPath)
 	public List<WCObject> getAllObjects() {
@@ -67,10 +69,16 @@ public class WCObjectController {
 			List<Tag> tags = tagRepository.findByIdIn(tagas);
 			wcObject.setTags(tags);
 			wcObject = wcobjectRepository.save(wcObject);
+			objectDao.insertWCObject(wcObject);
 			return wcObject;
 		} catch (Exception e) {
 			return null;
 		}
 	}
-
+	
+	@GetMapping(value = urlPath + "/{id}/search")
+	public WCObject searchObject(@PathVariable Long id) {
+		return objectDao.getWCObjectById(id+"");
+	}
+	
 }
